@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.controller;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -17,15 +18,18 @@ import java.util.List;
 public class ItemController {
     private final ItemService itemService;
 
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     @PostMapping
-    public ResponseEntity<ItemDto> create(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<ItemDto> create(@Valid @RequestBody ItemDto itemDto, @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("Post-запрос на добавление вещи {}", itemDto);
         return ResponseEntity.ok().body(itemService.create(itemDto, userId));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> update(@RequestBody ItemDto itemDto, @PathVariable Long itemId,
-                                          @RequestHeader("X-Sharer-User-Id") Long userId) {
+                                          @RequestHeader(USER_ID_HEADER) Long userId) {
         log.info("Patch-запрос на обновление вещи с id={}", itemId);
         return ResponseEntity.ok().body(itemService.update(itemDto, itemId, userId));
     }
@@ -37,7 +41,7 @@ public class ItemController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader("X-Sharer-User-Id") Long id) {
+    public ResponseEntity<List<ItemDto>> getAllUserItems(@RequestHeader(USER_ID_HEADER) Long id) {
         log.info("Get-запрос на получение вещей пользователя с id={}", id);
         return ResponseEntity.ok().body(itemService.getAllUserItems(id));
     }
