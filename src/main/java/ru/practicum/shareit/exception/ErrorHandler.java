@@ -12,47 +12,41 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class ErrorHandler {
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        log.error("Получен статус 400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
+    @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
         log.error("Получен статус 404 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ConflictException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflictException(final ConflictException e) {
         log.error("Получен статус 409 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({
+            ValidationException.class,
+            IllegalArgumentException.class
+    })
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(final IllegalArgumentException e) {
+    public ErrorResponse handleBadRequestExceptions(final RuntimeException e) {
         log.error("Получен статус 400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleIllegalArgumentException(final MethodArgumentNotValidException e) {
+    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error("Получен статус 400 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка: " + e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handlerException(final Throwable e) {
+    public ErrorResponse handleThrowable(final Throwable e) {
         log.error("Получен статус 500 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+        return new ErrorResponse("Ошибка: " + e.getMessage());
     }
-
-
 }
