@@ -1,14 +1,23 @@
 package ru.practicum.shareit.booking.dto;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.Booking;
 
-@Mapper(componentModel = "spring")
-public interface BookingMapper {
-    Booking toBooking(BookingDto bookingDto);
+public class BookingMapper {
+    public static Booking toBooking(BookingDto dto) {
+        Booking booking = new Booking();
+        booking.setStart(dto.getStart());
+        booking.setEnd(dto.getEnd());
+        return booking;
+    }
 
-    @Mapping(source = "item.id", target = "itemId")
-    @Mapping(source = "booker.id", target = "bookerId")
-    BookingDto toBookingDto(Booking booking);
+    public static BookingInfo toBookingInfo(Booking booking) {
+        BookingInfo bookingInfo = new BookingInfo();
+        bookingInfo.setId(booking.getId());
+        bookingInfo.setStart(booking.getStart());
+        bookingInfo.setEnd(booking.getEnd());
+        bookingInfo.setStatus(booking.getStatus());
+        bookingInfo.setItemId(booking.getItem().getId());
+        bookingInfo.setBookerId(booking.getBooker().getId());
+        return bookingInfo;
+    }
 }

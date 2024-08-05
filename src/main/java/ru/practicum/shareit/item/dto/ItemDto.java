@@ -2,28 +2,42 @@ package ru.practicum.shareit.item.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
-import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.comment.dto.CommentDto;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import ru.practicum.shareit.Marker.Create;
+import ru.practicum.shareit.booking.dto.BookingInfo;
+import ru.practicum.shareit.item.comment.CommentDto;
 
 import java.util.List;
 
-@Getter
-@Setter
-@EqualsAndHashCode
+/**
+ * TODO Sprint add-controllers.
+ */
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ItemDto {
-    private Long id;
-
-    @NotBlank
+    private long id;
+    @NotBlank(groups = Create.class)
     private String name;
 
-    @NotBlank
+    @NotBlank(groups = Create.class)
     private String description;
-    @NotNull
+
+    @NotNull(groups = Create.class)
     private Boolean available;
-    private BookingDto lastBooking;
-    private BookingDto nextBooking;
+
+    private BookingInfo lastBooking;
+
+    private BookingInfo nextBooking;
+
     private List<CommentDto> comments;
+
+    public ItemDto(long id, String name, String description, Boolean available) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+    }
 }
