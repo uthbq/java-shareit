@@ -1,63 +1,95 @@
 package ru.practicum.shareit.item;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Marker.Create;
-import ru.practicum.shareit.item.comment.CommentDto;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.comment.dto.CommentCreateDTO;
+import ru.practicum.shareit.comment.dto.CommentDto;
+import ru.practicum.shareit.comment.dto.CommentParams;
+import ru.practicum.shareit.item.dto.ItemCreateDto;
+import ru.practicum.shareit.item.dto.ItemFullDto;
+import ru.practicum.shareit.item.dto.ItemShortDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDTO;
+import ru.practicum.shareit.marker.Marker;
 
-import java.util.Collection;
+import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
+
+@Slf4j
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/items")
-@RequiredArgsConstructor
-@Slf4j
 @Validated
 public class ItemController {
-    private final ItemService itemService;
-    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
 
-    @GetMapping
-    public Collection<ItemDto> getAllByUserId(@RequestHeader(USER_ID_HEADER) long userId) {
-        log.info("GET /items");
-        return itemService.getAllByUserId(userId);
+    private static final String USER_ID = "X-Sharer-User-Id";
+    private final ItemService itemService;
+
+    @GetMapping("/{itemId}")
+    @Validated
+    public ItemFullDto getById(@PathVariable long itemId,
+                               @NotNull @RequestHeader(USER_ID) long userId) {
+        log.info("GET ==> /items");
+        ItemFullDto saveItem = itemService.getById(itemId, userId);
+        log.info("<== GET /items {}", saveItem);
+        return saveItem;
     }
 
-    @GetMapping("/{id}")
-    public ItemDto get(@PathVariable("id") long id, @RequestHeader(USER_ID_HEADER) Long userId) {
-        log.info("GET /items/{}", id);
-        return itemService.get(id, userId);
+    @PostMapping("{itemId}/comment")
+    @Validated
+    public CommentDto createComment(@Valid @RequestBody CommentCreateDTO comment,
+                                    @PathVariable long itemId,
+                                    @NotNull @RequestHeader(USER_ID) long userId) {
+        log.info("POST ==> /items/{}/comment Comment={}", itemId, comment);
+        CommentParams params = CommentParams.builder()
+                .authorId(userId)
+                .text(comment.getText())
+                .itemId(itemId)
+                .build();
+        CommentDto savedComment = itemService.createComment(params);
+        log.info("<== POST /items/{}/comment Comment={}", itemId, savedComment);
+        return savedComment;
+    }
+
+    @GetMapping
+    @Validated
+    public List<ItemFullDto> getAllOwnerItems(@RequestHeader(USER_ID) long ownerId) {
+        log.info("GET ==> /items");
+        List<ItemFullDto> savedItems = itemService.getAllOwnerItems(ownerId);
+        log.info("<== GET /items {}", savedItems);
+        return savedItems;
+    }
+
+    @PatchMapping("/{itemId}")
+    @Validated({Marker.Update.class})
+    public ItemShortDto update(@Valid @RequestBody ItemUpdateDTO item,
+                               @PathVariable long itemId,
+                               @NotNull @RequestHeader(USER_ID) long ownerId) {
+        item.setId(itemId);
+        log.info("PATCH ==> /items/{} {},ownerId={}", itemId, item, ownerId);
+
+        ItemShortDto updateItem = itemService.update(item, ownerId);
+        log.info("<== PATCH /items/{} {},ownerId={}", itemId, updateItem, ownerId);
+        return updateItem;
     }
 
     @PostMapping
-    @Validated(Create.class)
-    public ItemDto create(@Valid @RequestBody ItemDto item, @RequestHeader(USER_ID_HEADER) long userId) {
-        log.info("POST /items <- {} with userId {}", item, userId);
-        return itemService.create(item, userId);
-    }
-
-    @PatchMapping("/{id}")
-    public ItemDto update(@RequestBody ItemDto item, @PathVariable("id") long id,
-                          @RequestHeader(name = USER_ID_HEADER) long userId) {
-        log.info("PATCH /items/{} <- {} with userId {}", id, item, userId);
-        return itemService.update(item, id, userId);
+    @Validated({Marker.Create.class})
+    public ItemShortDto create(@Valid @RequestBody ItemCreateDto item,
+                               @RequestHeader(USER_ID) long ownerId) {
+        log.info("==>POST /items {}, ownerId={}", item, ownerId);
+        ItemShortDto createdItem = itemService.create(item, ownerId);
+        log.info("POST /items <== {}, ownerId={}", item, ownerId);
+        return createdItem;
     }
 
     @GetMapping("/search")
-    public Collection<ItemDto> search(@RequestParam("text") String text) {
-        log.info("GET /items/search?text={}", text);
+    @Validated
+    public List<ItemShortDto> search(@RequestParam(name = "text") String text) {
+        log.info("==>GET /search {}", text);
         return itemService.search(text);
-    }
-
-    @PostMapping("/{itemId}/comment")
-    public CommentDto addComment(@Valid @RequestBody CommentDto comment, @PathVariable long itemId, @RequestHeader(USER_ID_HEADER) long userId) {
-        log.info("POST /items/{}/comment", itemId);
-        return itemService.addComment(comment, itemId, userId);
     }
 }

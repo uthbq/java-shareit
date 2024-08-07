@@ -1,23 +1,39 @@
 package ru.practicum.shareit.booking.dto;
 
+import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.item.model.Item;
 
+@Component
 public class BookingMapper {
-    public static Booking toBooking(BookingDto dto) {
-        Booking booking = new Booking();
-        booking.setStart(dto.getStart());
-        booking.setEnd(dto.getEnd());
-        return booking;
+
+    public BookingFullDTO mapToDTO(Booking model) {
+        return BookingFullDTO.builder()
+                .id(model.getId())
+                .start(model.getStart())
+                .end(model.getEnd())
+                .booker(new BookingFullDTO.UserDto(model.getBooker().getId()))
+                .status(model.getStatus())
+                .itemName(model.getItem().getName())
+                .item(new BookingFullDTO.ItemDto(model.getItem().getId(), model.getItem().getName()))
+                .build();
     }
 
-    public static BookingInfo toBookingInfo(Booking booking) {
-        BookingInfo bookingInfo = new BookingInfo();
-        bookingInfo.setId(booking.getId());
-        bookingInfo.setStart(booking.getStart());
-        bookingInfo.setEnd(booking.getEnd());
-        bookingInfo.setStatus(booking.getStatus());
-        bookingInfo.setItemId(booking.getItem().getId());
-        bookingInfo.setBookerId(booking.getBooker().getId());
-        return bookingInfo;
+    public Booking mapToBooking(BookingCreateDTO dto, Item item) {
+        return Booking.builder()
+                .start(dto.getStart())
+                .end(dto.getEnd())
+                .booker(dto.getBooker())
+                .item(item)
+                .build();
+    }
+
+    public Booking mapToBookingInfo(Booking booking) {
+        return Booking.builder()
+                .start(booking.getStart())
+                .end(booking.getEnd())
+                .booker(booking.getBooker())
+                .item(booking.getItem())
+                .build();
     }
 }

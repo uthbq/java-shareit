@@ -1,20 +1,18 @@
 package ru.practicum.shareit.user;
 
-import jakarta.validation.Valid;
-import org.springframework.validation.annotation.Validated;
-import ru.practicum.shareit.Marker.Create;
+import ru.practicum.shareit.user.dto.UserDto;
 
-import java.util.Collection;
+import java.util.List;
 
 public interface UserService {
-    public Collection<User> getAll();
 
-    public User get(long id);
+    UserDto create(UserDto user);
 
-    @Validated(Create.class)
-    public User create(@Valid User user);
+    UserDto update(UserDto user);
 
-    public User update(long id, User user);
+    UserDto getById(long id);
 
-    public void delete(long id);
+    void deleteUserById(long id);
+
+    List<UserDto> getAll();
 }

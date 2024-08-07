@@ -1,43 +1,41 @@
 package ru.practicum.shareit.booking;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.ToString;
+import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
 
-import static ru.practicum.shareit.booking.BookingStatus.WAITING;
-
-/**
- * TODO Sprint add-bookings.
- */
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
-@Table(name = "BOOKINGS")
+@Builder
+@Table(name = "BOOKINGS", schema = "public")
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "start_time")
+    @Column(name = "start_date")
     private LocalDateTime start;
-
-    @Column(name = "end_time")
+    @Column(name = "end_date")
     private LocalDateTime end;
-
-    @ManyToOne
-    @JoinColumn(name = "item_id")
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ITEM_ID")
     private Item item;
-
-    @ManyToOne
-    @JoinColumn(name = "booker_id")
-    @ToString.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "BOOKER_ID")
     private User booker;
-
-    @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private BookingStatus status = WAITING;
+    private BookingStatus status;
+
+    public boolean isFuture(LocalDateTime now) {
+        return start.isAfter(now);
+    }
+
+    public boolean isLastOrCurrent(LocalDateTime now) {
+        return start.isBefore(now) && end.isEqual(now);
+    }
 }
