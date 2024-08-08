@@ -3,21 +3,20 @@ package ru.practicum.shareit.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import ru.practicum.shareit.marker.Marker;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 public class UserDto {
     private Long id;
-
-    @NotBlank(message = "Имя не может быть пустым")
+    @NotBlank(groups = Marker.Create.class)
     private String name;
-
-    @NotBlank(message = "Электронная почта не может быть пустой")
-    @Email(message = "Электронная почта не корректна")
+    @Email
+    @NotBlank(groups = Marker.Create.class)
     private String email;
 }
