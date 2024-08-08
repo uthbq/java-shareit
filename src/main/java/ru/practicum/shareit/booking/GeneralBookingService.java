@@ -20,6 +20,7 @@ import ru.practicum.shareit.user.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Transactional
 @Service
 @RequiredArgsConstructor
 public class GeneralBookingService implements BookingService {
@@ -29,7 +30,6 @@ public class GeneralBookingService implements BookingService {
     private final BookingMapper bookingMapper;
     private static final Sort NEWEST_FIRST = Sort.by(Sort.Direction.DESC, "start");
 
-    @Transactional
     @Override
     public BookingFullDTO create(BookingCreateDTO bookingDto, long bookerId) {
         User booker = getUserFromRepository(bookerId);
@@ -49,7 +49,6 @@ public class GeneralBookingService implements BookingService {
         return bookingMapper.mapToDTO(bookingRepository.save(booking));
     }
 
-    @Transactional
     @Override
     public BookingFullDTO approved(BookingParams params) {
         Booking savedBooking = getBookingFromRepository(params.getId());
@@ -83,7 +82,7 @@ public class GeneralBookingService implements BookingService {
     public List<BookingFullDTO> getUserBookings(BookingState state, Long userId) {
         User savedUser = getUserFromRepository(userId);
         return getBookingByStateAndBooker(state, savedUser).stream()
-                .map(bookingMapper::mapToDTO).toList();
+                .map(BookingMapper::mapToDTO).toList();
     }
 
     @Override
@@ -91,42 +90,44 @@ public class GeneralBookingService implements BookingService {
         User savedUser = getUserFromRepository(ownerId);
 
         return getBookingByStateAndOwner(state, savedUser).stream()
-                .map(bookingMapper::mapToDTO).toList();
+                .map(BookingMapper::mapToDTO).toList();
     }
 
     private List<Booking> getBookingByStateAndOwner(BookingState state, User owner) {
-        if (state.equals(BookingState.ALL)) {
-            return bookingRepository.findByItemOwner(owner, NEWEST_FIRST);
-        } else if (state.equals(BookingState.CURRENT)) {
-            return bookingRepository.findByItemOwnerAndEndAfterAndStartBefore(owner, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.PAST)) {
-            return bookingRepository.findByItemOwnerAndEndBefore(owner, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.FUTURE)) {
-            return bookingRepository.findByItemOwnerAndStartAfter(owner, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.REJECTED)) {
-            return bookingRepository.findByItemOwnerAndStatusIn(owner, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
-        } else if (state.equals(BookingState.WAITING)) {
-            return bookingRepository.findByItemOwnerAndStatusEquals(owner, BookingStatus.WAITING, NEWEST_FIRST);
-        } else {
-            return List.of();
+        switch (state) {
+            case ALL:
+                return bookingRepository.findByItemOwner(owner, NEWEST_FIRST);
+            case CURRENT:
+                return bookingRepository.findByItemOwnerAndEndAfterAndStartBefore(owner, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
+            case PAST:
+                return bookingRepository.findByItemOwnerAndEndBefore(owner, LocalDateTime.now(), NEWEST_FIRST);
+            case FUTURE:
+                return bookingRepository.findByItemOwnerAndStartAfter(owner, LocalDateTime.now(), NEWEST_FIRST);
+            case REJECTED:
+                return bookingRepository.findByItemOwnerAndStatusIn(owner, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
+            case WAITING:
+                return bookingRepository.findByItemOwnerAndStatusEquals(owner, BookingStatus.WAITING, NEWEST_FIRST);
+            default:
+                return List.of();
         }
     }
 
     private List<Booking> getBookingByStateAndBooker(BookingState state, User savedUser) {
-        if (state.equals(BookingState.ALL)) {
-            return bookingRepository.findByBooker(savedUser, NEWEST_FIRST);
-        } else if (state.equals(BookingState.CURRENT)) {
-            return bookingRepository.findByBookerAndEndAfterAndStartBefore(savedUser, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.PAST)) {
-            return bookingRepository.findByBookerAndEndBefore(savedUser, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.FUTURE)) {
-            return bookingRepository.findByBookerAndStartAfter(savedUser, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.REJECTED)) {
-            return bookingRepository.findByBookerAndStatusIn(savedUser, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
-        } else if (state.equals(BookingState.WAITING)) {
-            return bookingRepository.findByBookerAndStatusEquals(savedUser, BookingStatus.WAITING, NEWEST_FIRST);
-        } else {
-            return List.of();
+        switch (state) {
+            case ALL:
+                return bookingRepository.findByBooker(savedUser, NEWEST_FIRST);
+            case CURRENT:
+                return bookingRepository.findByBookerAndEndAfterAndStartBefore(savedUser, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
+            case PAST:
+                return bookingRepository.findByBookerAndEndBefore(savedUser, LocalDateTime.now(), NEWEST_FIRST);
+            case FUTURE:
+                return bookingRepository.findByBookerAndStartAfter(savedUser, LocalDateTime.now(), NEWEST_FIRST);
+            case REJECTED:
+                return bookingRepository.findByBookerAndStatusIn(savedUser, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
+            case WAITING:
+                return bookingRepository.findByBookerAndStatusEquals(savedUser, BookingStatus.WAITING, NEWEST_FIRST);
+            default:
+                return List.of();
         }
     }
 

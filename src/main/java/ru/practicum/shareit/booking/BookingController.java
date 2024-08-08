@@ -66,14 +66,6 @@ public class BookingController {
         return bookingDto;
     }
 
-    private static BookingState checkBookingState(String stateParam) {
-        BookingState state = BookingState.from(stateParam);
-        if (state == null) {
-            throw new IllegalArgumentException("Unknown state: " + stateParam);
-        }
-        return state;
-    }
-
     @GetMapping("/owner")
     public List<BookingFullDTO> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String stateParam,
                                                  @RequestHeader(USER_ID) long userId) {
@@ -83,5 +75,13 @@ public class BookingController {
         List<BookingFullDTO> bookingDto = bookingService.getOwnerBookings(state, userId);
         log.info("GET /bookings <== {} by {}", bookingDto, userId);
         return bookingDto;
+    }
+
+    private BookingState checkBookingState(String stateParam) {
+        BookingState state = BookingState.from(stateParam);
+        if (state == null) {
+            throw new IllegalArgumentException("Unknown state: " + stateParam);
+        }
+        return state;
     }
 }
