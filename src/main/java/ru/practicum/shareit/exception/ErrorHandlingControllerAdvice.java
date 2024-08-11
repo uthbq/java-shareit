@@ -42,12 +42,6 @@ public class ErrorHandlingControllerAdvice {
         }
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ErrorResponse(e.getMessage());
-    }
-
     @ExceptionHandler(NotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
@@ -69,9 +63,10 @@ public class ErrorHandlingControllerAdvice {
         }
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorResponse handleRuntimeException(final RuntimeException e) {
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleThrowable(final Throwable e) {
+        log.error("Unexpected error: {}", e.getMessage(), e);
+        return new ErrorResponse("Внутренняя ошибка сервера. Пожалуйста, попробуйте позже.");
     }
 }
