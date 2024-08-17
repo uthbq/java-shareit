@@ -6,9 +6,9 @@ import ru.practicum.shareit.request.ItemRequest;
 @Data
 public class ItemParams {
 
-    Long owner;
-    String name;
-    String description;
-    Boolean available;
-    ItemRequest request;
+    private Long owner;
+    private String name;
+    private String description;
+    private Boolean available;
+    private ItemRequest request;
 }
