@@ -17,7 +17,7 @@ public class ItemRequestFullDto {
     private Long id;
     private String description;
     private LocalDateTime created;
-    private List<Item> items;
+    public List<Item> items;
 
     public record Item(Long itemId, String name, Long userId) {
 
