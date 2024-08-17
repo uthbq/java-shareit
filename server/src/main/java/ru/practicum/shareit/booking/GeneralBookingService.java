@@ -29,7 +29,6 @@ public class GeneralBookingService implements BookingService {
     private final BookingMapper bookingMapper;
     private static final Sort NEWEST_FIRST = Sort.by(Sort.Direction.DESC, "start");
 
-    @Transactional
     @Override
     public BookingFullDTO create(BookingCreatetDto bookingDto, long bookerId) {
         User booker = getUserFromRepository(bookerId);
@@ -69,6 +68,7 @@ public class GeneralBookingService implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookingFullDTO getById(BookingParams params) {
         Booking savedBooking = getBookingFromRepository(params.getId());
         User savedUser = getUserFromRepository(params.getUserId());
@@ -80,6 +80,7 @@ public class GeneralBookingService implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingFullDTO> getUserBookings(BookingState state, Long userId) {
         User savedUser = getUserFromRepository(userId);
         return getBookingByStateAndBooker(state, savedUser).stream()
@@ -87,6 +88,7 @@ public class GeneralBookingService implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingFullDTO> getOwnerBookings(BookingState state, Long ownerId) {
         User savedUser = getUserFromRepository(ownerId);
 
@@ -94,6 +96,7 @@ public class GeneralBookingService implements BookingService {
                 .map(bookingMapper::mapToDTO).toList();
     }
 
+    @Transactional(readOnly = true)
     private List<Booking> getBookingByStateAndOwner(BookingState state, User owner) {
         return switch (state) {
             case ALL -> bookingRepository.findByItemOwner(owner, NEWEST_FIRST);
@@ -109,6 +112,7 @@ public class GeneralBookingService implements BookingService {
         };
     }
 
+    @Transactional(readOnly = true)
     private List<Booking> getBookingByStateAndBooker(BookingState state, User savedUser) {
         return switch (state) {
             case ALL -> bookingRepository.findByBooker(savedUser, NEWEST_FIRST);
@@ -124,16 +128,19 @@ public class GeneralBookingService implements BookingService {
         };
     }
 
+    @Transactional(readOnly = true)
     private Item getItemFromRepository(long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item not found with id: " + itemId));
     }
 
+    @Transactional(readOnly = true)
     private User getUserFromRepository(long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
     }
 
+    @Transactional(readOnly = true)
     private Booking getBookingFromRepository(long bookingId) {
         return bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found with id: " + bookingId));

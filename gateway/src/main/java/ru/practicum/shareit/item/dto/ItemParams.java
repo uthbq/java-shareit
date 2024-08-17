@@ -7,8 +7,8 @@ import lombok.Data;
 @AllArgsConstructor
 public class ItemParams {
 
-    Long owner;
-    String name;
-    String description;
-    Boolean available;
+    private Long owner;
+    private String name;
+    private String description;
+    private Boolean available;
 }

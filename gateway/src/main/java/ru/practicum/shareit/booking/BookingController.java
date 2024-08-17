@@ -4,11 +4,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingParams;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 
+@Controller
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j
@@ -65,14 +67,6 @@ public class BookingController {
         return bookingDto;
     }
 
-    private static BookingState checkBookingState(String stateParam) {
-        BookingState state = BookingState.from(stateParam);
-        if (state == null) {
-            throw new IllegalArgumentException("Unknown state: " + stateParam);
-        }
-        return state;
-    }
-
     @GetMapping("/owner")
     public ResponseEntity<Object> getOwnerBookings(@RequestParam(value = "state", defaultValue = "ALL") String stateParam,
                                                    @RequestHeader(USER_ID) long userId) {
@@ -82,6 +76,14 @@ public class BookingController {
         ResponseEntity<Object> bookingDto = bookingClient.getOwnerBookings(state, userId);
         log.info("GET /bookings <== {} by {}", bookingDto, userId);
         return bookingDto;
+    }
+
+    private BookingState checkBookingState(String stateParam) {
+        BookingState state = BookingState.from(stateParam);
+        if (state == null) {
+            throw new IllegalArgumentException("Unknown state: " + stateParam);
+        }
+        return state;
     }
 
 
