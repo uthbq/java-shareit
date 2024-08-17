@@ -48,7 +48,6 @@ public class GeneralBookingService implements BookingService {
         return bookingMapper.mapToDTO(bookingRepository.save(booking));
     }
 
-    @Transactional
     @Override
     public BookingFullDTO approved(BookingParams params) {
         Booking savedBooking = getBookingFromRepository(params.getId());
