@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.dto.ItemRequestParams;
@@ -27,12 +28,14 @@ public class ItemRequestController {
     }
 
     @GetMapping
+    @Validated
     public ResponseEntity<Object> getOwnRequests(@RequestHeader(USER_ID) long userId) {
         ResponseEntity<Object> dtos = itemRequestClient.getOwnRequests(userId);
         return dtos;
     }
 
     @GetMapping("/all")
+    @Validated
     public ResponseEntity<Object> getAllRequests(@RequestHeader(USER_ID) long userId,
                                                  @PositiveOrZero @RequestParam(value = "from", defaultValue = "0") Long from,
                                                  @Positive @RequestParam(value = "size", defaultValue = "10") Long size) {
@@ -42,6 +45,7 @@ public class ItemRequestController {
     }
 
     @GetMapping("/{requestId}")
+    @Validated
     public ResponseEntity<Object> getById(@PathVariable long requestId,
                                           @RequestHeader(USER_ID) long userId) {
         ResponseEntity<Object> dtos = itemRequestClient.getItemRequestById(requestId, userId);
