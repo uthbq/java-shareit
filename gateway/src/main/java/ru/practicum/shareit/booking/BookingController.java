@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingParams;
 import ru.practicum.shareit.booking.dto.BookingRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 
+@Controller
 @RestController
 @RequestMapping(path = "/bookings")
 @Slf4j

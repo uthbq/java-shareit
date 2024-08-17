@@ -95,39 +95,33 @@ public class GeneralBookingService implements BookingService {
     }
 
     private List<Booking> getBookingByStateAndOwner(BookingState state, User owner) {
-        if (state.equals(BookingState.ALL)) {
-            return bookingRepository.findByItemOwner(owner, NEWEST_FIRST);
-        } else if (state.equals(BookingState.CURRENT)) {
-            return bookingRepository.findByItemOwnerAndEndAfterAndStartBefore(owner, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.PAST)) {
-            return bookingRepository.findByItemOwnerAndEndBefore(owner, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.FUTURE)) {
-            return bookingRepository.findByItemOwnerAndStartAfter(owner, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.REJECTED)) {
-            return bookingRepository.findByItemOwnerAndStatusIn(owner, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
-        } else if (state.equals(BookingState.WAITING)) {
-            return bookingRepository.findByItemOwnerAndStatusEquals(owner, BookingStatus.WAITING, NEWEST_FIRST);
-        } else {
-            return List.of();
-        }
+        return switch (state) {
+            case ALL -> bookingRepository.findByItemOwner(owner, NEWEST_FIRST);
+            case CURRENT ->
+                    bookingRepository.findByItemOwnerAndEndAfterAndStartBefore(owner, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
+            case PAST -> bookingRepository.findByItemOwnerAndEndBefore(owner, LocalDateTime.now(), NEWEST_FIRST);
+            case FUTURE -> bookingRepository.findByItemOwnerAndStartAfter(owner, LocalDateTime.now(), NEWEST_FIRST);
+            case REJECTED ->
+                    bookingRepository.findByItemOwnerAndStatusIn(owner, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
+            case WAITING ->
+                    bookingRepository.findByItemOwnerAndStatusEquals(owner, BookingStatus.WAITING, NEWEST_FIRST);
+            default -> List.of();
+        };
     }
 
     private List<Booking> getBookingByStateAndBooker(BookingState state, User savedUser) {
-        if (state.equals(BookingState.ALL)) {
-            return bookingRepository.findByBooker(savedUser, NEWEST_FIRST);
-        } else if (state.equals(BookingState.CURRENT)) {
-            return bookingRepository.findByBookerAndEndAfterAndStartBefore(savedUser, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.PAST)) {
-            return bookingRepository.findByBookerAndEndBefore(savedUser, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.FUTURE)) {
-            return bookingRepository.findByBookerAndStartAfter(savedUser, LocalDateTime.now(), NEWEST_FIRST);
-        } else if (state.equals(BookingState.REJECTED)) {
-            return bookingRepository.findByBookerAndStatusIn(savedUser, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
-        } else if (state.equals(BookingState.WAITING)) {
-            return bookingRepository.findByBookerAndStatusEquals(savedUser, BookingStatus.WAITING, NEWEST_FIRST);
-        } else {
-            return List.of();
-        }
+        return switch (state) {
+            case ALL -> bookingRepository.findByBooker(savedUser, NEWEST_FIRST);
+            case CURRENT ->
+                    bookingRepository.findByBookerAndEndAfterAndStartBefore(savedUser, LocalDateTime.now(), LocalDateTime.now(), NEWEST_FIRST);
+            case PAST -> bookingRepository.findByBookerAndEndBefore(savedUser, LocalDateTime.now(), NEWEST_FIRST);
+            case FUTURE -> bookingRepository.findByBookerAndStartAfter(savedUser, LocalDateTime.now(), NEWEST_FIRST);
+            case REJECTED ->
+                    bookingRepository.findByBookerAndStatusIn(savedUser, BookingStatus.REJECTED, BookingStatus.CANCELED, NEWEST_FIRST);
+            case WAITING ->
+                    bookingRepository.findByBookerAndStatusEquals(savedUser, BookingStatus.WAITING, NEWEST_FIRST);
+            default -> List.of();
+        };
     }
 
     private Item getItemFromRepository(long itemId) {
